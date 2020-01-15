@@ -60,7 +60,10 @@ class RenesasM16CRawBinaryView(BinaryView):
                     SegmentFlag.SegmentExecutable)
         seg_code = SegmentFlag.SegmentContainsCode
         seg_data = SegmentFlag.SegmentContainsData
-        self.add_auto_segment(0x400, ram_size,
+        self.add_auto_segment(0x00000, 0x00400,
+                              0, 0,
+                              seg_rw_)
+        self.add_auto_segment(0x00400, ram_size,
                               0, 0,
                               seg_rw_|seg_data)
         self.add_auto_segment(0x100000 - len(data), len(data),
@@ -71,9 +74,9 @@ class RenesasM16CRawBinaryView(BinaryView):
         sec_ro_code = SectionSemantics.ReadOnlyCodeSectionSemantics
         sec_ro_data = SectionSemantics.ReadOnlyDataSectionSemantics
         sec_rw_data = SectionSemantics.ReadWriteDataSectionSemantics
-        self.add_auto_section('.sfr',    0, 0x400,
+        self.add_auto_section('.sfr',    0x00000, 0x00400,
                               sec_default)
-        self.add_auto_section('.data',   0x400, ram_size,
+        self.add_auto_section('.data',   0x00400, ram_size,
                               sec_rw_data)
         self.add_auto_section('.text',   0x100000 - len(data), len(data),
                               sec_ro_code)

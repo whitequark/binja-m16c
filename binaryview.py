@@ -1,8 +1,8 @@
 import json
 import struct
 
-from binaryninja import Architecture, Platform, BinaryView
-from binaryninja.enums import SegmentFlag, SectionSemantics
+from binaryninja import Architecture, Platform, BinaryView, Symbol
+from binaryninja.enums import SegmentFlag, SectionSemantics, SymbolType
 from binaryninja.settings import Settings
 
 
@@ -22,6 +22,18 @@ Settings().register_setting('arch.m16c.ramSize', json.dumps({
 class RenesasM16CRawBinaryView(BinaryView):
     name = "M16C ROM"
     long_name = "M16C ROM Binary"
+
+    vector_names = [
+        '_handle_und_instr',
+        '_handle_overflow',
+        '_handle_brk_instr',
+        '_handle_addr_match',
+        '_handle_single_step',
+        '_handle_watchdog',
+        '_handle_dbc',
+        '_handle_nmi',
+        '_reset',
+    ]
 
     @classmethod
     def is_valid_for_data(cls, data):
@@ -82,6 +94,11 @@ class RenesasM16CRawBinaryView(BinaryView):
                               sec_ro_code)
         self.add_auto_section('.rodata', 0x100000 - len(data), len(data),
                               sec_ro_data)
+
+        for vector_addr, vector_name in zip(range(0xFFFDC, 0x100000, 4), self.vector_names):
+            vector, = struct.unpack("<L", self.read(vector_addr, 4))
+            symbol = Symbol(SymbolType.FunctionSymbol, vector  & 0xFFFFF, vector_name)
+            self.define_auto_symbol(symbol)
 
         return True
 

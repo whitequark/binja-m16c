@@ -1,15 +1,27 @@
+import json
 import struct
 
 from binaryninja import Architecture, Platform, BinaryView
 from binaryninja.enums import SegmentFlag, SectionSemantics
+from binaryninja.settings import Settings
 
 
 __all__ = ['RenesasM16CRawBinaryView']
 
 
+Settings().register_setting('arch.m16c.ramSize', json.dumps({
+    "title": "M16C RAM Size",
+    "description": "Specify the amount of address space allocated for internal RAM.",
+    "type": "number",
+    "minValue": 0,
+    "maxValue": 31,
+    "default": 31,
+}))
+
+
 class RenesasM16CRawBinaryView(BinaryView):
     name = "M16C ROM"
-    long_name = "Raw M16C ROM"
+    long_name = "M16C ROM Binary"
 
     @classmethod
     def is_valid_for_data(cls, data):
@@ -40,13 +52,15 @@ class RenesasM16CRawBinaryView(BinaryView):
     def init(self):
         data = self.parent_view
 
+        ram_size = Settings().get_integer('arch.m16c.ramSize') * 1024
+
         seg_rw_  = (SegmentFlag.SegmentReadable |
                     SegmentFlag.SegmentWritable)
         seg_r_x  = (SegmentFlag.SegmentReadable |
                     SegmentFlag.SegmentExecutable)
         seg_code = SegmentFlag.SegmentContainsCode
         seg_data = SegmentFlag.SegmentContainsData
-        self.add_auto_segment(0x400, 0x8000 - 0x400,
+        self.add_auto_segment(0x400, ram_size,
                               0, 0,
                               seg_rw_|seg_data)
         self.add_auto_segment(0x100000 - len(data), len(data),
@@ -59,7 +73,7 @@ class RenesasM16CRawBinaryView(BinaryView):
         sec_rw_data = SectionSemantics.ReadWriteDataSectionSemantics
         self.add_auto_section('.sfr',    0, 0x400,
                               sec_default)
-        self.add_auto_section('.bss',    0x400, 0x8000 - 0x400,
+        self.add_auto_section('.data',   0x400, ram_size,
                               sec_rw_data)
         self.add_auto_section('.text',   0x100000 - len(data), len(data),
                               sec_ro_code)

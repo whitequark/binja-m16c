@@ -1,3 +1,4 @@
+import re
 from abc import ABCMeta, abstractmethod
 
 from ..helpers import *
@@ -8,6 +9,8 @@ __all__  = ['Instruction', 'InstrShortOpcode', 'InstrLongOpcode']
 
 class Instruction(metaclass=ABCMeta):
     opcodes = {}
+
+    show_suffix = True
 
     def __new__(cls, decoder=None):
         if decoder is None:
@@ -40,10 +43,16 @@ class Instruction(metaclass=ABCMeta):
     def analyze(self, info, addr):
         info.length += self.length()
 
+    def display_name(self):
+        if self.show_suffix:
+            return self.name()
+        else:
+            return re.sub(r":[GQSZ]$", "", self.name())
+
     def render(self, addr):
         return asm(
-            ('instr', self.name()),
-            ('opsep', ' ' * (8 - len(self.name())))
+            ('instr', self.display_name()),
+            ('opsep', ' ' * (8 - len(self.display_name())))
         )
 
     def lift(self, il, addr):

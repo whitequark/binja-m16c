@@ -1,11 +1,21 @@
+import json
 from binaryninja import log, Architecture, RegisterInfo, IntrinsicInfo, InstructionInfo
 from binaryninja.enums import Endianness, FlagRole, LowLevelILFlagCondition
 from binaryninja.types import Type
+from binaryninja.settings import Settings
 
 from . import mc
 
 
 __all__ = ['RenesasM16CArchitecture']
+
+
+Settings().register_setting('arch.m16c.showSuffix', json.dumps({
+    "title": "M16C Disassembly Suffix",
+    "description": "Whether or not to display the :G/:Q/:S/:Z suffix.",
+    "type": "boolean",
+    "default": True,
+}))
 
 
 class RenesasM16CArchitecture(Architecture):
@@ -81,6 +91,7 @@ class RenesasM16CArchitecture(Architecture):
                 log.log_error("Orig: {}".format(encoded.hex()))
                 log.log_error("New:  {}".format(recoded.hex()))
 
+            decoded.show_suffix = Settings().get_bool('arch.m16c.showSuffix')
             return decoded.render(addr), decoded.length()
 
     def get_instruction_low_level_il(self, data, addr, il):

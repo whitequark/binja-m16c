@@ -13,7 +13,8 @@ class RenesasM16CRawBinaryView(BinaryView):
 
     @classmethod
     def is_valid_for_data(cls, data):
-        # No especially good way to detect raw M16C ROM dumps, so let's use a few heuristics:
+        # Because the first instruction after reset *must* be `LDC #IMM16, ISP`, we can detect
+        # raw M16C ROM dumps pretty reliably:
         #  * ROM size may not exceed 512K
         if not (0 < len(data) <= 0x80000):
             return False
@@ -24,7 +25,10 @@ class RenesasM16CRawBinaryView(BinaryView):
         reset_vector, = struct.unpack("<L", data.read(len(data) - 4, 4))
         if not (0 < 0x100000 - (reset_vector & 0xFFFFF) < len(data)):
             return False
-        # Could be an M16C ROM then.
+        #  * first instruction must be `LDC #IMM16, ISP`
+        if data.read(len(data) - (0x100000 - (reset_vector & 0xFFFFF)), 2) != b"\xEB\x40":
+            return False
+        # Probably an M16C ROM then!
         return True
 
     def __init__(self, data):

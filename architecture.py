@@ -2,7 +2,7 @@ from binaryninja import log, Architecture, RegisterInfo, IntrinsicInfo, Instruct
 from binaryninja.enums import Endianness, FlagRole, LowLevelILFlagCondition
 from binaryninja.types import Type
 
-# from . import mc
+from . import mc
 
 
 __all__ = ['RenesasM16CArchitecture']
@@ -62,6 +62,32 @@ class RenesasM16CArchitecture(Architecture):
         'I': FlagRole.SpecialFlagRole,
         'U': FlagRole.SpecialFlagRole,
     }
+
+    def get_instruction_info(self, data, addr):
+        decoded = mc.decode(data, addr)
+        if decoded:
+            info = InstructionInfo()
+            decoded.analyze(info, addr)
+            return info
+
+    def get_instruction_text(self, data, addr):
+        decoded = mc.decode(data, addr)
+        if decoded:
+            encoded = data[:decoded.length()]
+            recoded = mc.encode(decoded, addr)
+            if encoded != recoded:
+                log.log_error("Instruction roundtrip error")
+                log.log_error("".join([str(x) for x in decoded.render(addr)]))
+                log.log_error("Orig: {}".format(encoded.hex()))
+                log.log_error("New:  {}".format(recoded.hex()))
+
+            return decoded.render(addr), decoded.length()
+
+    def get_instruction_low_level_il(self, data, addr, il):
+        decoded = mc.decode(data, addr)
+        if decoded:
+            decoded.lift(il, addr)
+            return decoded.length()
 
 
 RenesasM16CArchitecture.register()

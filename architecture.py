@@ -100,5 +100,8 @@ class RenesasM16CArchitecture(Architecture):
             decoded.lift(il, addr)
             return decoded.length()
 
+    def convert_to_nop(self, data, addr):
+        return b'\x04' * len(data)
+
 
 RenesasM16CArchitecture.register()

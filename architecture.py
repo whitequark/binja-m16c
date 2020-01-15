@@ -29,27 +29,31 @@ class RenesasM16CArchitecture(Architecture):
     regs = {
         # Data (banked in hardware)
         'R2R0': RegisterInfo('R2R0', 4, 0),
-            'R0': RegisterInfo('R2R0', 2, 0),
-                'R0L': RegisterInfo('R0L', 1, 0),
-                'R0H': RegisterInfo('R0H', 1, 1),
             'R2': RegisterInfo('R2R0', 2, 2),
+            'R0': RegisterInfo('R2R0', 2, 0),
+                'R0H': RegisterInfo('R0H', 1, 1),
+                'R0L': RegisterInfo('R0L', 1, 0),
         'R3R1': RegisterInfo('R3R1', 4, 0),
-            'R1': RegisterInfo('R3R1', 2, 0),
-                'R1L': RegisterInfo('R1L', 1, 0),
-                'R1H': RegisterInfo('R1H', 1, 1),
             'R3': RegisterInfo('R3R1', 2, 2),
+            'R1': RegisterInfo('R3R1', 2, 0),
+                'R1H': RegisterInfo('R1H', 1, 1),
+                'R1L': RegisterInfo('R1L', 1, 0),
         # Address
         'A1A0': RegisterInfo('A1A0', 4, 0),
-            'A0': RegisterInfo('A1A0', 2, 0),
             'A1': RegisterInfo('A1A0', 2, 2),
+            'A0': RegisterInfo('A1A0', 2, 0),
         # Frame base (banked in hardware)
         'FB': RegisterInfo('FB', 2, 0),
         # Program counter
-        'PC': RegisterInfo('PC', 2, 0),
+        'PC': RegisterInfo('PC', 3, 0),
         # Stack pointer (banked in hardware as USP/ISP)
         'SP': RegisterInfo('SP', 2, 0),
         # Static base
         'SB': RegisterInfo('SB', 2, 0),
+        # Interrupt base
+        'INTB': RegisterInfo('INTB', 4, 0),
+            'INTBH': RegisterInfo('INTB', 1, 2),
+            'INTBL': RegisterInfo('INTB', 2, 0),
     }
     flags = [
         'C', # Carry

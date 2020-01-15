@@ -76,6 +76,22 @@ class RenesasM16CArchitecture(Architecture):
         'I': FlagRole.SpecialFlagRole,
         'U': FlagRole.SpecialFlagRole,
     }
+    flags_required_for_flag_condition = {
+        LowLevelILFlagCondition.LLFC_E:   ['Z'],
+        LowLevelILFlagCondition.LLFC_NE:  ['Z'],
+        LowLevelILFlagCondition.LLFC_POS: ['S'],
+        LowLevelILFlagCondition.LLFC_NEG: ['S'],
+        LowLevelILFlagCondition.LLFC_SGE: ['S', 'O'],
+        LowLevelILFlagCondition.LLFC_SLT: ['S', 'O'],
+        LowLevelILFlagCondition.LLFC_SGT: ['Z', 'S', 'O'],
+        LowLevelILFlagCondition.LLFC_SLE: ['Z', 'S', 'O'],
+        LowLevelILFlagCondition.LLFC_UGE: ['C'],
+        LowLevelILFlagCondition.LLFC_ULT: ['C'],
+        LowLevelILFlagCondition.LLFC_UGT: ['C', 'Z'],
+        LowLevelILFlagCondition.LLFC_ULE: ['C', 'Z'],
+        LowLevelILFlagCondition.LLFC_O:   ['O'],
+        LowLevelILFlagCondition.LLFC_NO:  ['O'],
+    }
 
     def get_instruction_info(self, data, addr):
         decoded = mc.decode(data, addr)

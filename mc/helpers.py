@@ -2,7 +2,14 @@ from binaryninja import InstructionTextToken
 from binaryninja.enums import InstructionTextTokenType
 
 
-__all__ = ['token', 'asm']
+__all__ = ['get_bits', 'token', 'asm']
+
+
+def get_bits(opcode, bits, *, sext):
+    value = (opcode >> bits.start) & ((1 << len(bits)) - 1)
+    if sext and value & (1 << (len(bits) - 1)):
+        value |= -(1 << len(bits))
+    return value
 
 
 def token(kind, text, *data):
@@ -20,6 +27,10 @@ def token(kind, text, *data):
         tokenType = InstructionTextTokenType.IntegerToken
     elif kind == 'addr':
         tokenType = InstructionTextTokenType.PossibleAddressToken
+    elif kind == 'codeSym':
+        tokenType = InstructionTextTokenType.CodeSymbolToken
+    elif kind == 'dataSym':
+        tokenType = InstructionTextTokenType.DataSymbolToken
     elif kind == 'codeRelAddr':
         tokenType = InstructionTextTokenType.CodeRelativeAddressToken
     elif kind == 'beginMem':
@@ -27,7 +38,7 @@ def token(kind, text, *data):
     elif kind == 'endMem':
         tokenType = InstructionTextTokenType.EndMemoryOperandToken
     else:
-        raise ValueError('Invalid token kind {}'.format(kind))
+        raise ValueError("Invalid token kind {}".format(kind))
     return InstructionTextToken(tokenType, text, *data)
 
 

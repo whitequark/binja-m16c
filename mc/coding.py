@@ -33,32 +33,35 @@ class Decoder:
     def unsigned_byte(self):
         return self._unpack('B')
 
-    def signed_byte(self):
-        return self._unpack('b')
-
     def unsigned_word(self):
         return self._unpack('H')
 
-    def signed_word(self):
-        return self._unpack('h')
+    def unsigned_triple(self):
+        return self.unsigned_word() | (self.unsigned_byte() << 16)
 
-    def immediate(self, width):
+    def unsigned(self, width):
         if width == 1:
             return self.unsigned_byte()
         elif width == 2:
             return self.unsigned_word()
+        elif width == 3:
+            return self.unsigned_triple()
         else:
-            raise ValueError("invalid immediate width {}".format(width))
+            raise ValueError("invalid unsigned width {}".format(width))
 
-    def displacement(self, width):
-        if width == 0:
-            return 0
-        elif width == 1:
+    def signed_byte(self):
+        return self._unpack('b')
+
+    def signed_word(self):
+        return self._unpack('h')
+
+    def signed(self, width):
+        if width == 1:
             return self.signed_byte()
         elif width == 2:
             return self.signed_word()
         else:
-            raise ValueError("invalid displacement width {}".format(width))
+            raise ValueError("invalid signed width {}".format(width))
 
 
 class Encoder:
@@ -73,29 +76,33 @@ class Encoder:
     def unsigned_byte(self, value):
         self._pack('B', value)
 
-    def signed_byte(self, value):
-        self._pack('b', value)
-
     def unsigned_word(self, value):
         self._pack('H', value)
 
-    def signed_word(self, value):
-        self._pack('h', value)
+    def unsigned_triple(self, value):
+        self.unsigned_word(value & 0xFFFF)
+        self.unsigned_byte(value >> 16)
 
-    def immediate(self, value, width):
+    def unsigned(self, value, width):
         if width == 1:
             self.unsigned_byte(value)
         elif width == 2:
             self.unsigned_word(value)
+        elif width == 3:
+            self.unsigned_triple(value)
         else:
-            raise ValueError("invalid immediate width {}".format(width))
+            raise ValueError("invalid unsigned width {}".format(width))
 
-    def displacement(self, value, width):
-        if width == 0:
-            pass
-        elif width == 1:
+    def signed_byte(self, value):
+        self._pack('b', value)
+
+    def signed_word(self, value):
+        self._pack('h', value)
+
+    def signed(self, value, width):
+        if width == 1:
             self.signed_byte(value)
         elif width == 2:
             self.signed_word(value)
         else:
-            raise ValueError("invalid displacement width {}".format(width))
+            raise ValueError("invalid signed width {}".format(width))

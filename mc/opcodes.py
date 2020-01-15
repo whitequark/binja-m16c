@@ -235,15 +235,20 @@ def generate_tables():
     for encoding, instr in encodings.items():
         def expand_encoding(table, parts):
             part, *parts = parts
-            assert len(part) == 4
+            if ';' in part:
+                part, enum = part.split(';', 2)
+            else:
+                enum = ''
+            assert len(part) == 4 and len(enum) <= 1
 
             chunks = []
             try:
                 chunks.append(int(part, 2))
             except ValueError:
-                instr_code   = int(re.sub(r"[^01]", "0", part), 2)
-                instr_mask   = int(re.sub(r"[^01]", "0", part.replace("0", "1")), 2)
-                operand_mask = int(re.sub(r"[^01]", "1", part.replace("1", "0")), 2)
+                wildcard_part = re.sub(r'[A-Z]', '0', part)
+                instr_code   = int(re.sub(r'[^01]', '0', wildcard_part), 2)
+                instr_mask   = int(re.sub(r'[^01]', '0', wildcard_part.replace('0', '1')), 2)
+                operand_mask = int(re.sub(r'[^01]', '1', wildcard_part.replace('1', '0')), 2)
                 operand_code = 0
                 while True:
                     chunks.append(instr_code | operand_code)
@@ -254,6 +259,13 @@ def generate_tables():
                     # is the inverse of `operand_mask`, and adding 1 to a 011...1 chunk changes it
                     # into a 100...0 chunk.
                     operand_code = ((operand_code | instr_mask) + 1) & operand_mask
+
+                if enum:
+                    shift = 4 - re.search(r'[A-Z]+', part).end()
+                    chunks, chunk_templates = [], chunks
+                    for template in chunk_templates:
+                        for legal_bits in enumerations[enum]:
+                            chunks.append(template | (legal_bits << shift))
 
             for chunk in chunks:
                 if parts:
@@ -272,4 +284,19 @@ def generate_tables():
             parts.pop()
         expand_encoding(Instruction.opcodes, parts)
 
+
+def print_tables():
+    def contract_encoding(table, parts):
+        for part, entry in table.items():
+            if isinstance(entry, dict):
+                contract_encoding(entry, (*parts, part))
+            else:
+                encoding = '_'.join('{:04b}'.format(part) for part in (*parts, part))
+                mnemonic = entry().name()
+                print('{:20s} {}'.format(encoding, mnemonic))
+
+    contract_encoding(Instruction.opcodes, ())
+
+
 generate_tables()
+# print_tables()

@@ -1,13 +1,15 @@
 {
   "pluginmetadataversion" : 2,
   "name": "Renesas M16C Architecture",
-  "type": ["arch"],
+  "type": ["architecture"],
   "api": ["python3"],
   "description": "A plugin providing the Renesas M16C architecture.",
+  "longdescription": "The Renesas M16C plugin provides the corresponding architecture for Binary Ninja.\n\nThis plugin decodes all M16C instructions and provides control flow analysis. It also detects with a high degree of confidence, and relocates raw binary M16C ROM dumps.\n\nThis plugin does not currently provide lifting or SFR definitions.",
   "version": "0.1",
   "author": "whitequark",
   "minimumbinaryninjaversion": 1921,
   "platforms": ["Darwin", "Linux", "Windows"],
+  "installinstructions": {"Darwin":"", "Linux":"", "Windows":""},
   "license": {
     "name": "BSD-0-clause",
     "text": "Copyright (C) 2020 by whitequark\n\nPermission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE."

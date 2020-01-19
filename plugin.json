@@ -6,7 +6,7 @@
   "description": "A plugin providing the Renesas M16C architecture.",
   "version": "0.1",
   "author": "whitequark",
-  "minimumbinaryninjaversion": 555,
+  "minimumbinaryninjaversion": 1921,
   "platforms": ["Darwin", "Linux", "Windows"],
   "license": {
     "name": "BSD-0-clause",

@@ -94,7 +94,7 @@ class Pushm(InstrShortOpcode):
         return 'PUSHM'
 
     def new_operands(self):
-        return [OperMultiReg()]
+        return [OperMultiReg(reversed=False)]
 
 
 class PopReg8(InstrShortOpcode):
@@ -134,4 +134,4 @@ class Popm(InstrShortOpcode):
         return 'POPM'
 
     def new_operands(self):
-        return [OperMultiReg()]
+        return [OperMultiReg(reversed=True)]

@@ -611,6 +611,9 @@ class OperBitBase11SB(OperBitIndAbs):
 
 
 class OperMultiReg(Operand):
+    def __init__(self, reversed):
+        self.reversed = reversed
+
     def length(self):
         return 1
 
@@ -622,8 +625,11 @@ class OperMultiReg(Operand):
         return opcode
 
     def render(self, addr):
+        register_list = ['R0', 'R1', 'R2', 'R3', 'A0', 'A1', 'SB', 'FB']
+        if self.reversed:
+            register_list = reversed(register_list)
         tokens = []
-        for index, reg in enumerate(['FB', 'SB', 'A1', 'A0', 'R3', 'R2', 'R1', 'R0']):
+        for index, reg in enumerate(register_list):
             if self.reg_mask & (1 << index):
                 if tokens:
                     tokens += asm(('opsep', ', '))
